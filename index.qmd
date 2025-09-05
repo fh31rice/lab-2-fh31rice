@@ -648,7 +648,7 @@ With value of 1.3, the range is 3.5 to 15 inch approx.
 
 With value of 0.3, the range is 3.5 to 6.5 inch approx.
 
-That means, scale parameter actually determines the spread of the curve, with increased sigma, the range in y axis(Return level) increases.
+That means, scale parameter actually determines the spread of the curve, with increased sigma, the range in y axis(Return level) increases and curve becomes more steeper.
 
 We can consider. it as y=mx+c equation for the inverse CDF, where m is equivalent to sigma(scale parameter), and c(location parameter) is equavelant to mu. So, sigma increases mean m(slope in straight line eqn) is increasing, and that means the y axis value range(y2-y1) (RL) increases. (y2-y1) is the numerator in slope eqn, so it should increase for the slope value to be increased.
 
@@ -668,7 +668,7 @@ For -0.3, 0,0.15 and 0.3, I got RL value as 7.5,11,15 and 22
 
 *Do the red dots follow your blue curve? Where are the biggest deviations?*
 
-Ans: The graph shows that the red dot follows closely with the blue line. That means GEV is representing well to the closest station data, but the maximum deviation seems to happen to the increased return period where GEV underestimate the station data.
+Ans: The graph shows that the red dot(weibull position) follows closely with the blue line(GEV). That means GEV is representing well to the closest station data, but the maximum deviation seems to happen to the increased return period where GEV underestimate the station data.
 
 **Additional observations:**
 
