@@ -674,6 +674,6 @@ Ans: The graph shows that the red dot follows closely with the blue line. That m
 
 *Optional: Add any other interesting patterns you notice in the return period analysis.*
 
-Ans: I selected one location in El Paso, and tried to plot the nearest station data which is El Paso, I saw during different time period there are missing data in this station. So, from this station, rainfall trend prediction can be challenging.
+Ans: I selected one location in El Paso, and tried to plot the nearest station data which is El Paso, I saw during different time period there are missing data in this station. So, from these kind of stations, rainfall trend prediction can be challenging. 
 
 
