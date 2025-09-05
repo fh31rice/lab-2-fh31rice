@@ -1,7 +1,7 @@
 ---
 title: "Lab 2: Julia Data Handling"
 subtitle: "DataFrames.jl, Plotting with CairoMakie, TX precipitation datasets, Basic exploratory data analysis"
-author: CEVE 543 Fall 2025
+author: CEVE 543 Fall 2025 lab 2
 date: "2025-09-05"
 type: "lab"
 module: 1
@@ -21,7 +21,7 @@ format:
   html:
     toc: true
     toc-depth: 3
-    code-block-bg: "#f8f8f8"
+    code-block-bg: "#f0f8ff"
     code-block-border-left: "#e1e4e5"
     theme: simplex
     number-sections: true
@@ -320,9 +320,9 @@ function plot_stations()
 	poly!(ga, states.geometry;
 		strokecolor = :black, strokewidth = 1, color = :white)
 
-	# Create scatter plot with viridis colormap
+	# Create scatter plot with plasma colormap
 	scatter!(ga, stations.longitude, stations.latitude;
-		color = stations.years_of_data, colormap = :viridis, markersize = 10)  # <3>
+		color = stations.years_of_data, colormap = :plasma, markersize = 10)  # <3>
 
 	# Set plot bounds based on data bounds plus delta
 	delta = 0.3  # degrees of padding around the data bounds
@@ -333,7 +333,7 @@ function plot_stations()
 	ylims!(ga, min_lat - delta, max_lat + delta)
 
 	# Add colorbar
-	Colorbar(fig[1, 2], label = "Years of Data", colormap = :viridis,
+	Colorbar(fig[1, 2], label = "Years of Data", colormap = :plasma,
 		limits = (minimum(stations.years_of_data), maximum(stations.years_of_data)))
 
 	return fig
@@ -343,7 +343,7 @@ plot_stations()
 
 1. Create a GeoAxis with map projection: converts lat/lon coordinates to Mercator for proper display
 2. Download US state boundaries from Natural Earth (110 = medium resolution) for map background
-3. Plot weather stations colored by years of data using the viridis color scheme
+3. Plot weather stations colored by years of data using the plasma color scheme
 
 
 ### Finding Stations Near a Target Location
@@ -351,9 +351,9 @@ plot_stations()
 Let's say we want to study rainfall at a particular point. We'll use Rice University in Houston as our example:
 
 ```{julia}
-target_location = "Rice University"  # <1>
-target_lon = -95.404970              # <2>
-target_lat = 29.718952               # <3>
+target_location = "UT Austin"  # <1>
+target_lon = -97.73942              # <2>
+target_lat = 30.28614               # <3>
 ```
 
 1. Descriptive name for our target location (change this for different places!)
@@ -460,11 +460,11 @@ This is interesting! How does this compare to other nearby stations? Let's plot 
 function plot_nearby_comparison(stations_df, rainfall_data; n_stations = 4)
 	fig = Figure(size = (800, 400))
 	ax = Axis(fig[1, 1],
-		ylabel = "Annual Maximum Rainfall",
+		ylabel = "Annual max rainfall",
 		title = "Comparison of $(n_stations) Nearest Stations to $(target_location)",
 		dim2_conversion = rainfall_conversion)
 
-	colors = [get(colorschemes[:viridis], i / n_stations) for i in 0:n_stations-1]  # <1>
+	colors = [get(colorschemes[:plasma], i / n_stations) for i in 0:n_stations-1]  # <1>
 
 	for (i, station) in enumerate(eachrow(stations_df[1:n_stations, :]))  # <2>
 		station_id = station.stnid
@@ -486,7 +486,7 @@ end
 plot_nearby_comparison(stations, rainfall_data; n_stations = 4)
 ```
 
-1. Generate evenly-spaced colors from the viridis palette for each station
+1. Generate evenly-spaced colors from the plasma palette for each station
 2. Loop through the first `n_stations` closest weather stations 
 3. Use `!!` to inject the loop variable into the TidierData filter expression
 4. Add a legend in the top-left corner to identify different stations
@@ -500,9 +500,9 @@ Now we'll work with a GEV distribution to create return period plots and compare
 ```{julia}
 # GEV parameters for Houston area (units: inches)
 # Try modifying these values to better fit your data!
-μ = 4.0    # Location parameter - shifts the distribution left/right
-σ = 1.3    # Scale parameter - controls spread (must be > 0)
-ξ = 0.15   # Shape parameter - controls tail behavior
+μ = 2.4   # Location parameter - shifts the distribution left/right
+σ = 1.8    # Scale parameter - controls spread (must be > 0)
+ξ = 0.05   # Shape parameter - controls tail behavior
 
 houston_gev = GeneralizedExtremeValue(μ, σ, ξ)  # <1>
 ```
@@ -608,13 +608,13 @@ Explore the rainfall data to find one station where there *appears* to be a posi
 **Station with apparent positive trend:**
 
 *Write your answer here. Include the station name/ID and explain what you observe in the data that suggests an increasing trend.*
-
+Ans: I tried to plot data near UT Austin. From my visual observation, 63-0192(Barton CRK at Loop 360) tends to have a positive trend. As from timeline of 2000-2023, the annual max rainfall tends to increase rather than before 2000.
 
 
 **Station with apparent negative trend:**
 
 *Write your answer here. Include the station name/ID and explain what you observe in the data that suggests a decreasing trend.*
-
+Ans:  From my visual observation, 41-0420(Austin) station tends to have negative trend, although this station doesn't completely face a negative trend every year, it has also some spike increase in certain year. But, long term observation seems like the data is facing a negative trend.
 
 
 ### GEV Parameter Experimentation
@@ -624,26 +624,42 @@ Explore the rainfall data to find one station where there *appears* to be a posi
 *Record your starting parameters and the final parameters you chose after experimentation:*
 
 - Starting: $\mu = 4.0$, $\sigma = 1.3$, $\xi = 0.15$
-- Final: $\mu = \ldots$ $\sigma = \ldots$, $\xi = \ldots$
+- Final: $\mu = 2.4$ $\sigma = 1.8$, $\xi = 0.05$
 
 **Parameter Effects:**
 
 **What happened when you increased/decreased $\mu$ (location parameter)?**
 
 *Test values like $\mu = 2.0, 4.0, 6.0$. Describe how the entire GEV curve shifted and how this affected the fit to your red data points.*
+Ans: I noticed when I increased the location parameter to 6.0, the value of return level range shifts in betw 5 and 16 RL in y axis.
 
+When the location parameter is 4, the y axis range is 4 to 15.
 
+When I changed it to 2.0, the range is approx 1.5 to 12.5 in y axis.
+
+So, that means, with increase in location parameter, the curve shifts upward, and decrease in location parameter shifts curve downward, but the range remains same.
 
 **What happened when you increased/decreased $\sigma$ (scale parameter)?**
 
-*Test values like $\sigma = 0.8, 1.3, 2.0$. Describe how the curve became steeper/flatter and how this affected the spread of return levels.*
+*Test values like $\sigma = 0.3, 1.3, 2.0$. Describe how the curve became steeper/flatter and how this affected the spread of return levels.*
+Ans: When I changed sigma, say 2.0, the spread of values in y axis change,for 2.0, the value of return level ranges from 4 to 21 inch approx.
 
+With value of 1.3, the range is 3.5 to 15 inch approx.
 
+With value of 0.3, the range is 3.5 to 6.5 inch approx.
 
+That means, scale parameter actually determines the spread of the curve, with increased sigma, the range in y axis(Return level) increases.
+
+We can consider. it as y=mx+c equation for the inverse CDF, where m is equivalent to sigma(scale parameter), and c(location parameter) is equavelant to mu. So, sigma increases mean m(slope in straight line eqn) is increasing, and that means the y axis value range(y2-y1) (RL) increases. (y2-y1) is the numerator in slope eqn, so it should increase for the slope value to be increased.
+
+On the other hand, mu or c increases mean, the intercept(staright line eqn) is increasing, which results shift of the curve in upward direction.
 **What happened when you changed $\xi$ (shape parameter)?** 
 
 *Test $\xi = -0.1$ (light tail), $\xi = 0.0$ (Gumbel), $\xi = 0.15$, $\xi = 0.3$ (heavy tail). Focus on how the high return period end (right side) of the curve changed.*
 
+Ans: with negative shape parameter, the curve flattens to its upper value, but with increase in shape parameter the curve becomes more steep and y axis value increases rapidly.
+
+For -0.3, 0,0.15 and 0.3, I got RL value as 7.5,11,15 and 22
 
 
 **Final Assessment:**
@@ -652,12 +668,12 @@ Explore the rainfall data to find one station where there *appears* to be a posi
 
 *Do the red dots follow your blue curve? Where are the biggest deviations?*
 
-
+Ans: The graph shows that the red dot follows closely with the blue line. That means GEV is representing well to the closest station data, but the maximum deviation seems to happen to the increased return period where GEV underestimate the station data.
 
 **Additional observations:**
 
 *Optional: Add any other interesting patterns you notice in the return period analysis.*
 
-
+Ans: I selected one location in El Paso, and tried to plot the nearest station data which is El Paso, I saw during different time period there are missing data in this station. So, from this station, rainfall trend prediction can be challenging.
 
 
